@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     supabase_secret_key: str = ""
     resend_api_key: str = ""
     receptionist_email: str = "reception@brightsmileclinic.com"
+    sender_email: str = "BrightSmile Clinic <onboarding@resend.dev>"
 
     @property
     def db_configured(self) -> bool:

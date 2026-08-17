@@ -42,7 +42,7 @@ def send_appointment_email(data: dict) -> bool:
         return False
 
     payload = {
-        "from": f"BrightSmile Clinic <onboarding@resend.dev>",
+        "from": settings.sender_email,
         "to": [settings.receptionist_email],
         "subject": SUBJECT,
         "text": _render_body(data),

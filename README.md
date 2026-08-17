@@ -50,6 +50,7 @@ uv run uvicorn main:app --reload
 | `SUPABASE_SECRET_KEY`     | yes      | Server-only key (`sb_secret_...`) for inserts |
 | `RESEND_API_KEY`          | no       | Enables the receptionist email (dormant)   |
 | `RECEPTIONIST_EMAIL`      | no       | Default `reception@brightsmileclinic.com`  |
+| `SENDER_EMAIL`            | no       | From address, default `onboarding@resend.dev` |
 
 The secret key is used only server-side and is never exposed to the browser.
 
