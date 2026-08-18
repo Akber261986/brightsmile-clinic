@@ -140,7 +140,17 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }).then(function (res) {
-      if (!res.ok) throw new Error("Request failed");
+      if (!res.ok) {
+        return res.text().then(function (text) {
+          var detail = "";
+          try {
+            detail = JSON.parse(text).detail || "";
+          } catch (e) {
+            detail = text;
+          }
+          throw new Error("Request failed (" + res.status + "): " + detail);
+        });
+      }
       return res.json();
     });
   }
@@ -216,12 +226,14 @@
           form.remove();
           addMessage(data.message, "bot");
         })
-        .catch(function () {
+        .catch(function (err) {
           submitBtn.disabled = false;
           submitBtn.textContent = "Request appointment";
           statusEl.className = "bsc-error";
           statusEl.textContent =
-            "We couldn't submit your request right now. Please try again or contact reception at reception@brightsmileclinic.com.";
+            "We couldn't submit your request right now. " +
+            "Please try again, or contact reception at reception@brightsmileclinic.com. " +
+            "(" + err.message + ")";
         });
     });
   }
