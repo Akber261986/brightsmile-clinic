@@ -31,3 +31,4 @@ class AppointmentResponse(BaseModel):
     ok: bool
     message: str
     id: Optional[int] = None
+    
