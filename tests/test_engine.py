@@ -51,6 +51,7 @@ def test_filling_price_canned_in_all_forms():
 def test_services_list():
     assert intent_of("what services do you offer?") == "services"
     assert "Dental cleaning" in reply_of("what services do you offer?")
+    
 
 
 def test_insurance():
