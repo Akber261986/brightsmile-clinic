@@ -7,8 +7,10 @@ import logging
 from fastapi import APIRouter, HTTPException
 
 from . import knowledge
+from .config import get_settings
 from .emailer import send_appointment_email
 from .engine import match_intent
+from .llm import fallback_reply, generate_reply
 from .schemas import AppointmentRequest, AppointmentResponse, ChatRequest, ChatResponse
 from .supabase_db import insert_appointment
 
@@ -19,11 +21,30 @@ router = APIRouter()
 
 @router.get("/api/health")
 def health() -> dict:
-    return {"status": "ok", "name": knowledge.CLINIC_NAME}
+    settings = get_settings()
+    return {
+        "status": "ok",
+        "name": knowledge.CLINIC_NAME,
+        "engine": "llm" if settings.llm_configured else "rule-based",
+    }
 
 
 @router.post("/api/chat", response_model=ChatResponse)
-def chat(req: ChatRequest) -> ChatResponse:
+async def chat(req: ChatRequest) -> ChatResponse:
+    settings = get_settings()
+    if settings.llm_configured:
+        reply = await generate_reply(req.message)
+        if reply:
+            return ChatResponse(
+                intent="llm",
+                reply=reply.reply,
+                handoff=reply.handoff,
+                start_booking=reply.start_booking,
+            )
+        logger.warning("LLM unavailable, falling back to rule-based engine")
+        reply = fallback_reply()
+        return ChatResponse(intent="llm_fallback", reply=reply.reply, handoff=reply.handoff, start_booking=reply.start_booking)
+
     result = match_intent(req.message)
     return ChatResponse(
         intent=result.intent,

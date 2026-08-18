@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     receptionist_email: str = "reception@brightsmileclinic.com"
     sender_email: str = "BrightSmile Clinic <onboarding@resend.dev>"
 
+    gemini_api_key: str = ""
+    openai_api_key: str = ""
+    llm_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
+    llm_model: str = "gemini-3.5-flash"
+
     @property
     def db_configured(self) -> bool:
         return bool(self.supabase_url and self.supabase_secret_key)
@@ -24,6 +29,14 @@ class Settings(BaseSettings):
     @property
     def email_configured(self) -> bool:
         return bool(self.resend_api_key)
+
+    @property
+    def llm_api_key(self) -> str:
+        return self.gemini_api_key or self.openai_api_key
+
+    @property
+    def llm_configured(self) -> bool:
+        return bool(self.llm_api_key)
 
 
 @lru_cache
