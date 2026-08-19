@@ -67,6 +67,23 @@ async def generate_reply(message: str) -> AssistantReply | None:
         return None
 
 
+def warmup() -> None:
+    """Warm the LLM connection so the first user message is not slow."""
+    settings = get_settings()
+    if not settings.llm_configured:
+        return
+    try:
+        client, _ = _run_config()
+        client.chat.completions.create(
+            model=settings.llm_model,
+            messages=[{"role": "user", "content": "ok"}],
+            max_tokens=1,
+        )
+        logger.info("LLM warmup complete")
+    except Exception:  # noqa: BLE001 - warmup is best-effort
+        logger.warning("LLM warmup failed; will retry on first request")
+
+
 def fallback_reply() -> AssistantReply:
     settings = get_settings()
     return AssistantReply(

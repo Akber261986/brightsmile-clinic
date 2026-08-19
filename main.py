@@ -5,13 +5,26 @@ Run locally with:  uv run uvicorn main:app --reload
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.config import get_settings
+from app.llm import warmup
 from app.routes import router
 
-app = FastAPI(title="BrightSmile Chatbot Agent", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    settings = get_settings()
+    if settings.llm_configured:
+        warmup()
+    yield
+
+
+app = FastAPI(title="BrightSmile Chatbot Agent", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,3 +37,4 @@ app.include_router(router)
 
 app.mount("/widget", StaticFiles(directory="widget"), name="widget")
 app.mount("/demo", StaticFiles(directory="frontend", html=True), name="demo")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="root")
