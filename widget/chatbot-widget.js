@@ -85,6 +85,16 @@
   /* ---------- state ---------- */
   var started = false;
   var open = false;
+  var isFileProtocol = window.location.protocol === "file:";
+
+  function setupHint() {
+    if (!isFileProtocol) return;
+    addMessage(
+      "Heads up: this page was opened directly from your file system, so the browser " +
+      "won't let the widget reach the assistant API.\n\n" +
+      "Right way to test: run the server and open http://127.0.0.1:8000/ in your browser."
+    );
+  }
 
   /* ---------- message rendering ---------- */
   function addMessage(text, who) {
@@ -175,9 +185,13 @@
           showBookingForm();
         }
       })
-      .catch(function () {
+      .catch(function (err) {
         hideTyping(typing);
-        addMessage("Sorry, I couldn't reach the assistant right now. Please try again in a moment.", "bot");
+        var why = err && err.message ? " (" + err.message + ")" : "";
+        addMessage(
+          "Sorry, I couldn't reach the assistant right now. Please try again in a moment." + why,
+          "bot"
+        );
       });
   }
 
