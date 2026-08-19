@@ -27,7 +27,6 @@
         font-size: 32px;
         margin-bottom: 12px;
       }
-      
       .hero p {
         color: #475569;
         line-height: 1.6;
@@ -42,6 +41,21 @@
         max-width: 720px;
         font-size: 14px;
       }
+      .status {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #065f46;
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin: 8px auto;
+        max-width: 720px;
+        font-size: 14px;
+      }
+      .status.off {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #991b1b;
+      }
     </style>
   </head>
   <body>
@@ -54,12 +68,33 @@
       </p>
     </div>
     <div class="banner">
-      Test the widget below (bottom-right corner). Check: greeting on open, services/prices,
-      the dental filling price rule, booking flow, and the Talk to a Human option.
+      Testing from this page: the widget talks to the agent API server.
+      This page can be opened either through the agent server itself
+      (<b>http://127.0.0.1:8000/</b>) or via Live Server — the widget always
+      points at the agent address below (override with <code>?api=URL</code>).
     </div>
+    <div id="agent-status" class="status">Checking agent...</div>
 
     <script>
-      window.BrightSmileChatbot = { apiBase: "" };
+      (function () {
+        var api =
+          new URLSearchParams(window.location.search).get("api") ||
+          "http://127.0.0.1:8000";
+        window.BrightSmileChatbot = { apiBase: api };
+
+        var el = document.getElementById("agent-status");
+        fetch(api + "/api/health", { method: "GET" })
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            el.textContent =
+              "Agent online: " + d.name + " (engine: " + (d.engine || "?") + ") at " + api;
+          })
+          .catch(function () {
+            el.textContent =
+              "Agent OFFLINE at " + api + " - start it with:  uv run uvicorn main:app --reload";
+            el.className = "status off";
+          });
+      })();
     </script>
     <script src="/widget/chatbot-widget.js"></script>
   </body>
