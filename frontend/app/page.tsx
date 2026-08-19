@@ -1,69 +1,102 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import BackendStatus from "@/components/BackendStatus";
+import ChatWidget from "@/components/ChatWidget";
+
+const services = [
+  {
+    name: "General Dentistry",
+    desc: "Check-ups, cleanings, fillings and preventive care for the whole family.",
+    price: "from $90",
+  },
+  {
+    name: "Cosmetic Dentistry",
+    desc: "Teeth whitening, veneers and smile makeovers.",
+    price: "from $350",
+  },
+  {
+    name: "Orthodontics",
+    desc: "Braces, retainers and clear aligners to straighten your smile.",
+    price: "from $1,800",
+  },
+  {
+    name: "Emergency Care",
+    desc: "Walk-in care for toothaches, broken teeth and other urgent issues.",
+    price: "same-day",
+  },
+];
+
+const hours = [
+  ["Monday – Friday", "8:00 AM – 6:00 PM"],
+  ["Saturday", "9:00 AM – 2:00 PM"],
+  ["Sunday", "Closed"],
+];
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
+    <>
+      <div className="landing">
+        <header className="site-header">
+          <div className="logo" aria-hidden="true">
+            &#129460;
+          </div>
+          <div>
+            <h1>BrightSmile Dental Clinic</h1>
+            <p className="tagline">A friendly, experienced team at your service</p>
+          </div>
+        </header>
+
+        <section className="hero">
+          <h2>We keep your smile bright</h2>
           <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+            General, cosmetic and emergency dental care in a comfortable,
+            modern clinic. Ask our online assistant about services, prices,
+            opening hours or to book an appointment &mdash; just click the chat
+            bubble in the bottom-right corner.
           </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          <BackendStatus />
+        </section>
+
+        <section className="section">
+          <h2>Services &amp; prices</h2>
+          <ul className="cards">
+            {services.map((s) => (
+              <li key={s.name} className="card">
+                <h3>{s.name}</h3>
+                <p>{s.desc}</p>
+                <span className="price">{s.price}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="section">
+          <h2>Opening hours</h2>
+          <ul className="hours">
+            {hours.map(([days, time]) => (
+              <li key={days}>
+                <span>{days}</span>
+                <span>{time}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="section">
+          <h2>Contact</h2>
+          <address className="contact">
+            <p>123 Sunshine Avenue,<br />Springfield</p>
+            <p>Phone: <a href="tel:+15550182">+1 555-0182</a></p>
+            <p>Email: <a href="mailto:reception@brightsmileclinic.com">reception@brightsmileclinic.com</a></p>
+          </address>
+        </section>
+
+        <footer className="site-footer">
+          <p>
+            This is a demo so you can try our AI assistant &mdash; ask it about
+            prices, hours, or to book an appointment.
+          </p>
+        </footer>
+      </div>
+      <ChatWidget />
+    </>
   );
 }
