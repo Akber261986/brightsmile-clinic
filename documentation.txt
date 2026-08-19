@@ -1,0 +1,93 @@
+Here is the documentation for the clinic chatbot:
+
+BrightSmile Clinic — Knowledge Base
+
+Clinic name: BrightSmile Dental Clinic
+
+Opening hours
+
+Monday–Friday: 9:00 AM – 6:00 PM
+Saturday: 10:00 AM – 2:00 PM
+Sunday: Closed
+
+Services
+
+Dental cleaning — $80
+Dental examination — $50
+Teeth whitening — $250
+Dental filling — starting at $120
+Emergency consultation — $100
+
+Important pricing rule
+
+The chatbot must never promise an exact price when the final cost can vary.
+
+For dental fillings, it should say:
+
+"Dental fillings start at $120. The final cost may vary depending on the treatment required. Please contact our clinic for an exact estimate."
+
+Frequently Asked Questions
+
+Do you accept insurance?
+Yes. We accept most major dental insurance plans. Patients should contact reception to confirm whether their specific plan is accepted.
+
+Do you offer emergency appointments?
+Yes. Emergency consultations are available during clinic hours, subject to availability.
+
+Where are you located?
+BrightSmile Dental Clinic, 125 Main Street, Springfield.
+
+Do I need an appointment?
+Appointments are recommended. Walk-ins may be accepted depending on availability.
+
+How can I book an appointment?
+The chatbot can collect an appointment request. A receptionist will review the request and contact the patient to confirm the appointment.
+
+Can I cancel my appointment?
+Please contact reception as soon as possible if you need to cancel or reschedule.
+
+Do you provide medical advice?
+No. The chatbot must not provide diagnosis, treatment recommendations, medication advice, or other medical advice.
+
+If a patient asks a medical question outside the approved knowledge base, the chatbot should politely explain that it cannot provide medical advice and offer the Talk to a Human option.
+
+Appointment Request
+
+The chatbot should collect:
+
+Name
+Email
+Phone
+Preferred date
+Preferred time
+Reason for visit
+
+After submission:
+
+"Your appointment request has been received and sent to our reception team. Your appointment is not confirmed yet. Our receptionist will contact you to confirm availability."
+
+Human Handoff
+
+Email: reception@brightsmileclinic.com
+Phone: +1 555-0182
+
+The chatbot should offer human assistance when:
+
+It doesn't have the requested information.
+The patient asks for medical advice.
+The patient explicitly asks to speak with someone.
+The request requires receptionist confirmation.
+Appointment Email
+
+The receptionist should receive:
+
+New Appointment Request
+
+Patient: John Smith
+Email: john@example.com
+Phone: +1 555-1234
+Preferred Date: August 20
+Preferred Time: 3:00 PM
+Reason: Dental cleaning
+
+Status: Pending
