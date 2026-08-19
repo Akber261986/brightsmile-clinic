@@ -28,6 +28,7 @@ app = FastAPI(title="BrightSmile Chatbot Agent", version="0.1.0", lifespan=lifes
 @app.get("/")
 async def root():
     return {"message": "App is running Successfully", "docs": "/api/docs"}
+    
 @app.get("/api")
 async def apiroute():
     return {"message": "Api route is running."}
