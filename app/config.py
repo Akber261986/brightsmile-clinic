@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     receptionist_email: str = "reception@brightsmileclinic.com"
     sender_email: str = "BrightSmile Clinic <onboarding@resend.dev>"
 
-    gemini_api_key: str = 
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY")
     openai_api_key: str = ""
     llm_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
     llm_model: str = "gemini-3.5-flash"
