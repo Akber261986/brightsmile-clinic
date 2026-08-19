@@ -25,6 +25,10 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="BrightSmile Chatbot Agent", version="0.1.0", lifespan=lifespan)
 
+@app.get("/")
+async def root():
+    return {"message": "App is running Successfully"}
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
