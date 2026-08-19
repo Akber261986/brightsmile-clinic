@@ -266,6 +266,7 @@
       started = true;
       setTimeout(function () {
         addMessage("Hello! Welcome to BrightSmile Dental Clinic. I can help you with our services, prices, opening hours, and appointment requests. How can I help you today?", "bot");
+        setupHint();
         setChips(["Opening hours", "Services & prices", "Book an appointment", "Talk to a human"]);
       }, 300);
     }
@@ -295,4 +296,10 @@
     openWidget();
     showHumanInfo();
   });
+
+  if (isFileProtocol) {
+    setTimeout(function () {
+      openWidget();
+    }, 200);
+  }
 })();
