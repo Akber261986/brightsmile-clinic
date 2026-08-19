@@ -23,7 +23,7 @@ router = APIRouter()
 def health() -> dict:
     settings = get_settings()
     return {
-        "status": "Healthy",
+        "status": "ok",
         "name": knowledge.CLINIC_NAME,
         "engine": "llm" if settings.llm_configured else "rule-based",
     }
