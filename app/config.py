@@ -3,9 +3,10 @@
 from __future__ import annotations
 from dotenv import load_dotenv
 from functools import lru_cache
-
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+load_dotenv()
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
