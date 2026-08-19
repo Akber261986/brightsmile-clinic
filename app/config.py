@@ -1,7 +1,7 @@
 """Application settings loaded from environment / .env."""
 
 from __future__ import annotations
-
+from dotenv import load_dotenv
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     receptionist_email: str = "reception@brightsmileclinic.com"
     sender_email: str = "BrightSmile Clinic <onboarding@resend.dev>"
 
-    gemini_api_key: str = ""
+    gemini_api_key: str = 
     openai_api_key: str = ""
     llm_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
     llm_model: str = "gemini-3.5-flash"
