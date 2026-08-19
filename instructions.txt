@@ -16,3 +16,4 @@ Send the appointment request to our receptionist.
 Tell the patient that their request has been received and is pending confirmation.
 Provide a Talk to a Human option when appropriate.
 Work properly on both desktop and mobile.
+
