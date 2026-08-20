@@ -5,7 +5,7 @@ const services = [
   {
     name: "General Dentistry",
     desc: "Check-ups, cleanings, fillings and preventive care for the whole family.",
-    price: "from $90",
+    price: "from $120",
   },
   {
     name: "Cosmetic Dentistry",
