@@ -25,8 +25,8 @@ const services = [
 ];
 
 const hours = [
-  ["Monday – Friday", "8:00 AM – 6:00 PM"],
-  ["Saturday", "9:00 AM – 2:00 PM"],
+  ["Monday – Friday", "9:00 AM – 6:00 PM"],
+  ["Saturday", "10:00 AM – 2:00 PM"],
   ["Sunday", "Closed"],
 ];
 
