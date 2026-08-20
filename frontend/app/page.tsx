@@ -83,7 +83,7 @@ export default function Home() {
         <section className="section">
           <h2>Contact</h2>
           <address className="contact">
-            <p>123 Sunshine Avenue,<br />Springfield</p>
+            <p>125 Main Street, Springfield,<br />Springfield</p>
             <p>Phone: <a href="tel:+15550182">+1 555-0182</a></p>
             <p>Email: <a href="mailto:reception@brightsmileclinic.com">reception@brightsmileclinic.com</a></p>
           </address>
