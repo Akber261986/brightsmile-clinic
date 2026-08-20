@@ -10,12 +10,12 @@ const services = [
   {
     name: "Cosmetic Dentistry",
     desc: "Teeth whitening, veneers and smile makeovers.",
-    price: "from $350",
+    price: "from $250",
   },
   {
     name: "Orthodontics",
     desc: "Braces, retainers and clear aligners to straighten your smile.",
-    price: "from $1,800",
+    price: "from $1,200",
   },
   {
     name: "Emergency Care",
