@@ -44,7 +44,7 @@ class AppointmentOut(BaseModel):
     reason: Optional[str] = None
     status: str
     receptionist_message: Optional[str] = None
-    created_at: Optional[str] = None
+    created_at: Optional[Union[datetime, str]] = None
 
 
 class AppointmentRejectRequest(BaseModel):
