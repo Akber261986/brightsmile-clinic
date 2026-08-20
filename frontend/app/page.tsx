@@ -92,7 +92,7 @@ export default function Home() {
         <footer className="site-footer">
           <p>
             This is a demo so you can try our AI assistant &mdash; ask it about
-            prices, hours, or to book an appointment.
+            prices, hours, or to book an appointment. Try it Now.
           </p>
         </footer>
       </div>
