@@ -11,8 +11,13 @@ create table if not exists public.appointments (
     preferred_time text not null,
     reason text,
     status text not null default 'pending',
+    receptionist_message text,
     created_at timestamptz not null default now()
 );
+
+-- If the table already exists, add the receptionist note used on rejection.
+alter table public.appointments
+    add column if not exists receptionist_message text;
 
 -- 2) Enable RLS (defense in depth). Writes happen server-side with the
 --    secret key, which bypasses RLS. Public/anonymous access stays locked.

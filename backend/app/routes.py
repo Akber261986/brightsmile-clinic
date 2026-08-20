@@ -8,11 +8,19 @@ from fastapi import APIRouter, HTTPException
 
 from . import knowledge
 from .config import get_settings
-from .emailer import send_appointment_email
+from .emailer import send_appointment_email, send_patient_status_email
 from .engine import match_intent
 from .llm import fallback_reply, generate_reply
-from .schemas import AppointmentRequest, AppointmentResponse, ChatRequest, ChatResponse
-from .supabase_db import insert_appointment
+from .schemas import (
+    AppointmentDecisionResponse,
+    AppointmentOut,
+    AppointmentRejectRequest,
+    AppointmentRequest,
+    AppointmentResponse,
+    ChatRequest,
+    ChatResponse,
+)
+from .supabase_db import get_appointment, insert_appointment, list_appointments, update_appointment
 
 logger = logging.getLogger(__name__)
 
@@ -75,3 +83,69 @@ def create_appointment(req: AppointmentRequest) -> AppointmentResponse:
 
     appointment_id = rows[0].get("id") if rows else None
     return AppointmentResponse(ok=True, message=knowledge.APPOINTMENT_CONFIRMATION, id=appointment_id)
+
+
+@router.get("/api/appointments", response_model=list[AppointmentOut])
+def get_appointments() -> list[AppointmentOut]:
+    rows, error = list_appointments()
+    if error:
+        logger.error("Failed to list appointments: %s", error)
+        raise HTTPException(status_code=500, detail="Could not load appointment requests.")
+    return rows or []
+
+
+def _require_pending(appointment_id: int) -> dict:
+    row, error = get_appointment(appointment_id)
+    if error:
+        logger.error("Failed to load appointment %s: %s", appointment_id, error)
+        raise HTTPException(status_code=500, detail="Could not load the appointment request.")
+    if row is None:
+        raise HTTPException(status_code=404, detail="Appointment request not found.")
+    if row.get("status") != "pending":
+        raise HTTPException(
+            status_code=409,
+            detail=f"This request is already {row.get('status')}.",
+        )
+    return row
+
+
+@router.post("/api/appointments/{appointment_id}/approve", response_model=AppointmentDecisionResponse)
+def approve_appointment(appointment_id: int) -> AppointmentDecisionResponse:
+    _require_pending(appointment_id)
+    rows, error = update_appointment(appointment_id, {"status": "approved"})
+    if error:
+        logger.error("Failed to approve appointment %s: %s", appointment_id, error)
+        raise HTTPException(status_code=500, detail="Could not approve the appointment.")
+    if not rows:
+        raise HTTPException(status_code=404, detail="Appointment request not found.")
+
+    updated = rows[0]
+    send_patient_status_email(updated, approved=True)
+    return AppointmentDecisionResponse(
+        ok=True,
+        message="Appointment approved and confirmation emailed to the patient.",
+        appointment=updated,
+    )
+
+
+@router.post("/api/appointments/{appointment_id}/reject", response_model=AppointmentDecisionResponse)
+def reject_appointment(appointment_id: int, req: AppointmentRejectRequest) -> AppointmentDecisionResponse:
+    _require_pending(appointment_id)
+    note = req.message.strip()
+    rows, error = update_appointment(
+        appointment_id,
+        {"status": "rejected", "receptionist_message": note},
+    )
+    if error:
+        logger.error("Failed to reject appointment %s: %s", appointment_id, error)
+        raise HTTPException(status_code=500, detail="Could not reject the appointment.")
+    if not rows:
+        raise HTTPException(status_code=404, detail="Appointment request not found.")
+
+    updated = rows[0]
+    send_patient_status_email(updated, approved=False, message=note)
+    return AppointmentDecisionResponse(
+        ok=True,
+        message="Appointment rejected and email sent to the patient.",
+        appointment=updated,
+    )

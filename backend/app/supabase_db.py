@@ -37,3 +37,55 @@ def insert_appointment(data: dict) -> tuple[list | None, str | None]:
     except Exception as exc:  # noqa: BLE001 - surface a readable error to the API
         logger.exception("Appointment insert failed")
         return None, str(exc)
+
+
+def list_appointments() -> tuple[list | None, str | None]:
+    """Return all appointment requests, newest first."""
+    try:
+        client = _get_client()
+        result = (
+            client.table("appointments")
+            .select("*")
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return result.data or [], None
+    except Exception as exc:  # noqa: BLE001 - surface a readable error to the API
+        logger.exception("Appointment list failed")
+        return None, str(exc)
+
+
+def get_appointment(appointment_id: int) -> tuple[dict | None, str | None]:
+    """Fetch a single appointment by id."""
+    try:
+        client = _get_client()
+        result = (
+            client.table("appointments")
+            .select("*")
+            .eq("id", appointment_id)
+            .limit(1)
+            .execute()
+        )
+        rows = result.data or []
+        if not rows:
+            return None, None
+        return rows[0], None
+    except Exception as exc:  # noqa: BLE001 - surface a readable error to the API
+        logger.exception("Appointment fetch failed")
+        return None, str(exc)
+
+
+def update_appointment(appointment_id: int, data: dict) -> tuple[list | None, str | None]:
+    """Update one appointment. Returns (rows, error_message)."""
+    try:
+        client = _get_client()
+        result = (
+            client.table("appointments")
+            .update(data)
+            .eq("id", appointment_id)
+            .execute()
+        )
+        return result.data or [], None
+    except Exception as exc:  # noqa: BLE001 - surface a readable error to the API
+        logger.exception("Appointment update failed")
+        return None, str(exc)
