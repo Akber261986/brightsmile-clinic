@@ -1,3 +1,4 @@
+import Link from "next/link";
 import BackendStatus from "@/components/BackendStatus";
 import ChatWidget from "@/components/ChatWidget";
 
@@ -42,6 +43,9 @@ export default function Home() {
             <h1>BrightSmile Dental Clinic</h1>
             <p className="tagline">A friendly, experienced team at your service</p>
           </div>
+          <Link className="nav-link" href="/appointments">
+            Appointment requests
+          </Link>
         </header>
 
         <section className="hero">

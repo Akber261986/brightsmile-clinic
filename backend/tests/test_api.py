@@ -99,6 +99,121 @@ def test_appointment_submission(monkeypatch):
     assert inserted["status"] == "pending"
 
 
+def test_list_appointments(monkeypatch):
+    rows = [
+        {
+            "id": 2,
+            "name": "Ada",
+            "email": "ada@example.com",
+            "phone": "555",
+            "preferred_date": "Aug 21",
+            "preferred_time": "10:00 AM",
+            "reason": None,
+            "status": "pending",
+            "receptionist_message": None,
+            "created_at": "2026-08-21T00:00:00Z",
+        }
+    ]
+    monkeypatch.setattr(app.routes, "list_appointments", lambda: (rows, None))
+    res = client.get("/api/appointments")
+    assert res.status_code == 200
+    assert res.json()[0]["name"] == "Ada"
+
+
+def test_approve_appointment(monkeypatch):
+    pending = {
+        "id": 1,
+        "name": "John Smith",
+        "email": "john@example.com",
+        "phone": "+1 555-1234",
+        "preferred_date": "August 20",
+        "preferred_time": "3:00 PM",
+        "reason": "Cleaning",
+        "status": "pending",
+        "receptionist_message": None,
+        "created_at": "2026-08-21T00:00:00Z",
+    }
+    approved = {**pending, "status": "approved"}
+    emailed = {}
+
+    monkeypatch.setattr(app.routes, "get_appointment", lambda _id: (pending, None))
+    monkeypatch.setattr(app.routes, "update_appointment", lambda _id, data: ([{**approved, **data}], None))
+    monkeypatch.setattr(
+        app.routes,
+        "send_patient_status_email",
+        lambda data, approved, message=None: emailed.update({"approved": approved, "email": data["email"]}) or True,
+    )
+
+    res = client.post("/api/appointments/1/approve")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["ok"] is True
+    assert body["appointment"]["status"] == "approved"
+    assert emailed["approved"] is True
+    assert emailed["email"] == "john@example.com"
+
+
+def test_reject_appointment(monkeypatch):
+    pending = {
+        "id": 1,
+        "name": "John Smith",
+        "email": "john@example.com",
+        "phone": "+1 555-1234",
+        "preferred_date": "August 20",
+        "preferred_time": "3:00 PM",
+        "reason": "Cleaning",
+        "status": "pending",
+        "receptionist_message": None,
+        "created_at": "2026-08-21T00:00:00Z",
+    }
+    emailed = {}
+
+    def fake_update(_id, data):
+        return [{**pending, **data}], None
+
+    monkeypatch.setattr(app.routes, "get_appointment", lambda _id: (pending, None))
+    monkeypatch.setattr(app.routes, "update_appointment", fake_update)
+    monkeypatch.setattr(
+        app.routes,
+        "send_patient_status_email",
+        lambda data, approved, message=None: emailed.update(
+            {"approved": approved, "message": message, "email": data["email"]}
+        )
+        or True,
+    )
+
+    res = client.post("/api/appointments/1/reject", json={"message": "No slots that day."})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["appointment"]["status"] == "rejected"
+    assert body["appointment"]["receptionist_message"] == "No slots that day."
+    assert emailed["approved"] is False
+    assert emailed["message"] == "No slots that day."
+
+
+def test_reject_requires_message(monkeypatch):
+    res = client.post("/api/appointments/1/reject", json={"message": ""})
+    assert res.status_code == 422
+
+
+def test_approve_already_decided(monkeypatch):
+    decided = {
+        "id": 1,
+        "name": "John Smith",
+        "email": "john@example.com",
+        "phone": "+1 555-1234",
+        "preferred_date": "August 20",
+        "preferred_time": "3:00 PM",
+        "reason": "Cleaning",
+        "status": "approved",
+        "receptionist_message": None,
+        "created_at": "2026-08-21T00:00:00Z",
+    }
+    monkeypatch.setattr(app.routes, "get_appointment", lambda _id: (decided, None))
+    res = client.post("/api/appointments/1/approve")
+    assert res.status_code == 409
+
+
 def test_appointment_validation():
     res = client.post(
         "/api/appointments",
