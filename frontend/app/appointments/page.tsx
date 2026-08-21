@@ -91,6 +91,7 @@ export default function AppointmentsPage() {
     }
     setBusyId(id);
     setError("");
+    setNotice("");
     try {
       const res = await fetch(`${AGENT_URL}/api/appointments/${id}/reject`, {
         method: "POST",
@@ -101,9 +102,7 @@ export default function AppointmentsPage() {
       if (!res.ok) {
         throw new Error(body.detail || "Could not reject this request.");
       }
-      setItems((current) =>
-        current.map((item) => (item.id === id ? body.appointment : item)),
-      );
+      applyDecision(body);
       setRejectingId(null);
       setRejectNote("");
     } catch (err) {
@@ -129,6 +128,7 @@ export default function AppointmentsPage() {
       </header>
 
       {error ? <p className="form-error">{error}</p> : null}
+      {notice ? <p className="form-ok">{notice}</p> : null}
       {loading ? <p className="muted">Loading requests&hellip;</p> : null}
       {!loading && items.length === 0 && !error ? (
         <p className="muted">No appointment requests yet.</p>
