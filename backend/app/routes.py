@@ -109,9 +109,17 @@ def _require_pending(appointment_id: int) -> dict:
     return row
 
 
+def _decision_message(*, approved: bool, email_sent: bool, email_error: str | None) -> str:
+    action = "approved" if approved else "rejected"
+    if email_sent:
+        return f"Appointment {action} and email sent to the patient."
+    detail = email_error or "the email could not be sent"
+    return f"Appointment {action}, but the patient email was not sent: {detail}"
+
+
 @router.post("/api/appointments/{appointment_id}/approve", response_model=AppointmentDecisionResponse)
 def approve_appointment(appointment_id: int) -> AppointmentDecisionResponse:
-    _require_pending(appointment_id)
+    pending = _require_pending(appointment_id)
     rows, error = update_appointment(appointment_id, {"status": "approved"})
     if error:
         logger.error("Failed to approve appointment %s: %s", appointment_id, error)
@@ -119,12 +127,14 @@ def approve_appointment(appointment_id: int) -> AppointmentDecisionResponse:
     if not rows:
         raise HTTPException(status_code=404, detail="Appointment request not found.")
 
-    updated = rows[0]
-    send_patient_status_email(updated, approved=True)
+    updated = {**pending, **rows[0], "status": "approved"}
+    email_sent, email_error = send_patient_status_email(updated, approved=True)
     return AppointmentDecisionResponse(
         ok=True,
-        message="Appointment approved and confirmation emailed to the patient.",
+        message=_decision_message(approved=True, email_sent=email_sent, email_error=email_error),
         appointment=updated,
+        email_sent=email_sent,
+        email_error=email_error,
     )
 
 

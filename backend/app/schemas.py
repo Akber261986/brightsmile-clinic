@@ -55,4 +55,6 @@ class AppointmentDecisionResponse(BaseModel):
     ok: bool
     message: str
     appointment: AppointmentOut
+    email_sent: bool = False
+    email_error: Optional[str] = None
     
