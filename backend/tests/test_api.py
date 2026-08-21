@@ -154,6 +154,34 @@ def test_approve_appointment(monkeypatch):
     assert emailed["email"] == "john@example.com"
 
 
+def test_approve_reports_email_failure(monkeypatch):
+    pending = {
+        "id": 1,
+        "name": "John Smith",
+        "email": "john@example.com",
+        "phone": "+1 555-1234",
+        "preferred_date": "August 20",
+        "preferred_time": "3:00 PM",
+        "reason": "Cleaning",
+        "status": "pending",
+        "receptionist_message": None,
+        "created_at": "2026-08-21T00:00:00Z",
+    }
+    monkeypatch.setattr(app.routes, "get_appointment", lambda _id: (pending, None))
+    monkeypatch.setattr(app.routes, "update_appointment", lambda _id, data: ([{**pending, **data}], None))
+    monkeypatch.setattr(
+        app.routes,
+        "send_patient_status_email",
+        lambda data, approved, message=None: (False, "You can only send testing emails to your own email address."),
+    )
+    res = client.post("/api/appointments/1/approve")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["appointment"]["status"] == "approved"
+    assert body["email_sent"] is False
+    assert "testing emails" in body["message"]
+
+
 def test_reject_appointment(monkeypatch):
     pending = {
         "id": 1,
