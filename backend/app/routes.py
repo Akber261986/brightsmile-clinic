@@ -140,7 +140,7 @@ def approve_appointment(appointment_id: int) -> AppointmentDecisionResponse:
 
 @router.post("/api/appointments/{appointment_id}/reject", response_model=AppointmentDecisionResponse)
 def reject_appointment(appointment_id: int, req: AppointmentRejectRequest) -> AppointmentDecisionResponse:
-    _require_pending(appointment_id)
+    pending = _require_pending(appointment_id)
     note = req.message.strip()
     rows, error = update_appointment(
         appointment_id,
@@ -152,10 +152,12 @@ def reject_appointment(appointment_id: int, req: AppointmentRejectRequest) -> Ap
     if not rows:
         raise HTTPException(status_code=404, detail="Appointment request not found.")
 
-    updated = rows[0]
-    send_patient_status_email(updated, approved=False, message=note)
+    updated = {**pending, **rows[0], "status": "rejected", "receptionist_message": note}
+    email_sent, email_error = send_patient_status_email(updated, approved=False, message=note)
     return AppointmentDecisionResponse(
         ok=True,
-        message="Appointment rejected and email sent to the patient.",
+        message=_decision_message(approved=False, email_sent=email_sent, email_error=email_error),
         appointment=updated,
+        email_sent=email_sent,
+        email_error=email_error,
     )

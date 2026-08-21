@@ -141,7 +141,7 @@ def test_approve_appointment(monkeypatch):
     monkeypatch.setattr(
         app.routes,
         "send_patient_status_email",
-        lambda data, approved, message=None: emailed.update({"approved": approved, "email": data["email"]}) or True,
+        lambda data, approved, message=None: emailed.update({"approved": approved, "email": data["email"]}) or (True, None),
     )
 
     res = client.post("/api/appointments/1/approve")
@@ -149,6 +149,7 @@ def test_approve_appointment(monkeypatch):
     body = res.json()
     assert body["ok"] is True
     assert body["appointment"]["status"] == "approved"
+    assert body["email_sent"] is True
     assert emailed["approved"] is True
     assert emailed["email"] == "john@example.com"
 
@@ -179,7 +180,7 @@ def test_reject_appointment(monkeypatch):
         lambda data, approved, message=None: emailed.update(
             {"approved": approved, "message": message, "email": data["email"]}
         )
-        or True,
+        or (True, None),
     )
 
     res = client.post("/api/appointments/1/reject", json={"message": "No slots that day."})

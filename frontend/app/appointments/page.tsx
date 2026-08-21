@@ -23,6 +23,7 @@ export default function AppointmentsPage() {
   const [items, setItems] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [rejectingId, setRejectingId] = useState<number | null>(null);
   const [rejectNote, setRejectNote] = useState("");
   const [busyId, setBusyId] = useState<number | null>(null);
@@ -45,9 +46,27 @@ export default function AppointmentsPage() {
     void load();
   }, [load]);
 
+  function applyDecision(body: {
+    appointment?: Appointment;
+    email_sent?: boolean;
+    message?: string;
+  }) {
+    if (body.appointment) {
+      setItems((current) =>
+        current.map((item) => (item.id === body.appointment!.id ? body.appointment! : item)),
+      );
+    }
+    if (body.email_sent) {
+      setNotice(body.message || "Email sent to the patient.");
+    } else {
+      setError(body.message || "The appointment was updated, but the email was not sent.");
+    }
+  }
+
   async function confirmAppointment(id: number) {
     setBusyId(id);
     setError("");
+    setNotice("");
     try {
       const res = await fetch(`${AGENT_URL}/api/appointments/${id}/approve`, {
         method: "POST",
@@ -56,9 +75,7 @@ export default function AppointmentsPage() {
       if (!res.ok) {
         throw new Error(body.detail || "Could not confirm this request.");
       }
-      setItems((current) =>
-        current.map((item) => (item.id === id ? body.appointment : item)),
-      );
+      applyDecision(body);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not confirm this request.");
     } finally {
